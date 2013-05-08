@@ -468,7 +468,7 @@
         			
         		} else {
         			// create thumbnails
-        			$(gallery).parent().after('<div class="gallery-thumb-navigation"></div>');
+        			$('#gallery-wrapper').append('<div class="gallery-thumb-navigation"></div>');
         			var divContent = $(gallery).html();
         			$('.gallery-thumb-navigation').html( divContent );
         			
