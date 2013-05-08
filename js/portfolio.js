@@ -19,7 +19,7 @@
 
 ;(function($) {
 
-    $.fn.portfolio = function(settings) {
+    $.fn.radium_gallery_h = function(settings) {
         
     // default values 
     var defaults = {
@@ -32,25 +32,27 @@
         width: '100%',
         lightbox: false,
         showArrows: true,
-        logger: true
+        logger: true,
+        showThumbnails: false,
+        showScrollbar: true
     };
 
     // overriding default values
     $.extend(this, defaults, settings);
 
     // Local variables
-    var portfolio = this, gallery = this,
+    var radium_gallery_h = this, gallery = this,
     currentViewingImage,
     totalLoaded = 0,
     offset_left = 6,
     imageLoadedCalled = false;
 
-    // portfolio public methods
+    // radium_gallery_h public methods
     $.extend(this, {
-        version: "0.1v",
+        version: "0.2",
         init: function() {
 
-            portfolio.scrollToOptions={axis: 'x', easing: portfolio.easingMethod, offset: -4}
+            radium_gallery_h.scrollToOptions={axis: 'x', easing: radium_gallery_h.easingMethod, offset: -4}
 
             // Responsive for Mobile
             if ($(window).width() <= 700) {
@@ -58,13 +60,13 @@
                 // 200px fixed height is good enough?
                 
                 // override gallery height
-                portfolio.height = '200px';
+                radium_gallery_h.height = '200px';
             }
 
             // CSS Base
             $(this).css({
-                width: portfolio.width,
-                'max-height': portfolio.height,
+                width: radium_gallery_h.width,
+                'max-height': radium_gallery_h.height,
                 'overflow-x': 'scroll',
                 'overflow-y': 'hidden',
                 'white-space': 'nowrap'
@@ -73,7 +75,7 @@
             $(this).find('img').css({
                 display: 'inline-block',
                 'max-width': 'none',
-                height: portfolio.height,
+                height: radium_gallery_h.height,
                 width: 'auto'
             });
 
@@ -93,30 +95,40 @@
 
             // spinner
             // show spinner while the images are being loaded...
-            portfolio.spinner.show('100%');
+            radium_gallery_h.spinner.show('100%');
 
             // load first 4 images
-            portfolio.loadNextImages(portfolio.firstLoadCount);
+            radium_gallery_h.loadNextImages(radium_gallery_h.firstLoadCount);
             
             // First Image
             $(this).find("img").first().addClass('active');
 
-            if (portfolio.lightbox) {
+            if (radium_gallery_h.lightbox) {
                 $(gallery).find('img').not('.active').animate({opacity: '0.2'});
                 $(gallery).find('img.active').animate({opacity: '1'});
                 $(gallery).css({ 'overflow-x': 'hidden' });
             }
-
+			
+			 // Show scrollbar
+			if (!radium_gallery_h.showScrollbar) {
+			    $(gallery).css({ 'overflow-x': 'hidden' });
+			}
+			
             // Show Arrows
-            if (portfolio.showArrows) {
-                portfolio.navigation.show();
+            if (radium_gallery_h.showArrows) {
+                radium_gallery_h.navigation.show();
             }
-
+			
+			// Show Thumbnails
+			if (radium_gallery_h.showThumbnails) {
+			    radium_gallery_h.thumbnails.show();
+			}
+			
             // add a 5px space at the end
             $('.gallery-blank-space').css({
                 position: 'absolute',
                 width: '5px',
-                height: portfolio.height,
+                height: radium_gallery_h.height,
             });
 
             // Events
@@ -124,10 +136,10 @@
             /* Swipe Left */
             $(this).swipe( {
                 swipeLeft: function() {
-                                portfolio.next();
+                                radium_gallery_h.next();
                             },
                 swipeRight: function() {
-                                portfolio.prev();
+                                radium_gallery_h.prev();
                             }
             });
 
@@ -147,13 +159,15 @@
                 if ($(gallery).find('img.active')[0] === $(this)[0]) {
                     // If clicked on the current viewing image
                     // then scroll to next image
-                    portfolio.next();
+                    radium_gallery_h.next();
 
                 }
                 else {
                     // clicked on the next image or particular image, scroll to that image
-                    portfolio.slideTo($(this));
+                    radium_gallery_h.slideTo( $(this) );
                 }
+                
+                console.log( $(this) );
             }); // click()
 
             // Gallery Scroll
@@ -169,7 +183,7 @@
 
                         if (totalLoaded < $(gallery).find('img').length) {
                             console_.log('scroll(): loading some more images');
-                            portfolio.loadNextImages(6);
+                            radium_gallery_h.loadNextImages(6);
                             // $(gallery).find('img[loaded=true]').last().addClass('ctive');
 
                         }
@@ -184,9 +198,9 @@
                     $(gallery).find('.gallery-arrow-left, .gallery-arrow-right').css({height: '200px'});
                 }
                 else if ($(window).width() > 700 && $(gallery).find('img').first().height()===200) {
-                    $(gallery).css({height: portfolio.height});
-                    $(gallery).find('img').css({height: portfolio.height});
-                    $(gallery).find('.gallery-arrow-left, .gallery-arrow-right').css({height: portfolio.height});
+                    $(gallery).css({height: radium_gallery_h.height});
+                    $(gallery).find('img').css({height: radium_gallery_h.height});
+                    $(gallery).find('.gallery-arrow-left, .gallery-arrow-right').css({height: radium_gallery_h.height});
                 }
             });
 
@@ -200,15 +214,15 @@
             if($(cur_img).attr('last') === 'true') {
 
                 // if on last image and if loop is on 
-                if(portfolio.loop) {
+                if(radium_gallery_h.loop) {
                     // go to first image 
                     console_.log('last', 'loop: on');
 
-                    $(gallery).scrollTo(0, 500, portfolio.scrollToOptions);
+                    $(gallery).scrollTo(0, 500, radium_gallery_h.scrollToOptions);
 
                     $(gallery).find('img').removeClass('active').first().addClass('active');
 
-                    if (portfolio.lightbox) {
+                    if (radium_gallery_h.lightbox) {
                         $(gallery).find('img').not('.active').animate({opacity: '0.2'});
                         $(gallery).find('img.active').animate({opacity: '1'});
                     }
@@ -221,12 +235,12 @@
             // if next image is already loaded
             else if ($(next_img).attr('loaded') === 'true') {
                 // go to next image
-                $(gallery).scrollTo(next_img, 600, portfolio.scrollToOptions);
+                $(gallery).scrollTo(next_img, 600, radium_gallery_h.scrollToOptions);
 
                 $(gallery).find('img').removeClass('active');
                 $(next_img).addClass('active');
 
-                if (portfolio.lightbox) {
+                if (radium_gallery_h.lightbox) {
                     $(gallery).find('img').not('.active').animate({opacity: '0.2'});
                     $(gallery).find('img.active').animate({opacity: '1'});
                 }
@@ -243,7 +257,7 @@
                 console_.log('scrollEnd');
                 var spinner_target = $(currentViewingImage).after('<span class="spinner-container"></span>');
                 $(gallery).scrollTo($(currentViewingImage).data("offset-left") + 100, 500, {axis: 'x'});
-                portfolio.spinner(spinner_target);
+                radium_gallery_h.spinner(spinner_target);
             }
             */
             console_.log('next: current viewing image', $(gallery).find('img.active'));
@@ -258,12 +272,12 @@
             }
             else if (prev_img){
                 // go to prev image
-                $(gallery).scrollTo(prev_img, 500, portfolio.scrollToOptions);
+                $(gallery).scrollTo(prev_img, 500, radium_gallery_h.scrollToOptions);
 
                 $(gallery).find('img').removeClass('active');
                 $(prev_img).addClass('active');
 
-                if (portfolio.lightbox) {
+                if (radium_gallery_h.lightbox) {
                     $(gallery).find('img').not('.active').animate({opacity: '0.2'});
                     $(gallery).find('img.active').animate({opacity: '1'});
                 }
@@ -274,12 +288,12 @@
 
         slideTo: function(img) {
 
-            $(gallery).scrollTo(img, 500, portfolio.scrollToOptions);
+            $(gallery).scrollTo(img, 500, radium_gallery_h.scrollToOptions);
 
             $(gallery).find('img').removeClass('active');
             $(img).addClass('active');
 
-            if (portfolio.lightbox) {
+            if (radium_gallery_h.lightbox) {
                 $(gallery).find('img').not('.active').animate({opacity: '0.2'});
                 $(gallery).find('img.active').animate({opacity: '1'});
             }
@@ -293,13 +307,13 @@
 
             show: function(width) {
                 // Spinner
-                portfolio.spinner.remove();
+                radium_gallery_h.spinner.remove();
 
                 var lastImg = $(gallery).find('img[loaded=true]').last();
                 $(gallery).append('<span class="spinner-container"></span>');
                 $(gallery).find('.spinner-container').css({
                     display: 'inline-block',
-                    height: portfolio.height,
+                    height: radium_gallery_h.height,
                     width: width,
                     'vertical-align': 'top'
                 });
@@ -318,7 +332,7 @@
                     hwaccel: false, // Whether to use hardware acceleration
                     className: 'spinner', // The CSS class to assign to the spinner
                     zIndex: 2e9, // The z-index (defaults to 2000000000)
-                    top: parseInt(portfolio.height)/2, // Top position relative to parent in px
+                    top: parseInt(radium_gallery_h.height)/2, // Top position relative to parent in px
                     left: 'auto' // Left position relative to parent in px
                 };
 
@@ -354,7 +368,7 @@
                         // Inorder to fadeIn effect to work, make the new
                         // img element invisible by 'display: none'
                         $(img).css({display: 'none'});
-                        portfolio.spinner.remove();
+                        radium_gallery_h.spinner.remove();
                         $(img).fadeIn('slow');
 
                         img_width = $(img).width();
@@ -366,17 +380,17 @@
 
                     }); // each()
 
-                    portfolio.spinner.show('100px');
+                    radium_gallery_h.spinner.show('100px');
                     imageLoadedCalled = false;
 
                     // loaded all images
                     if (totalLoaded === $(gallery).find('img').length) {
-                        portfolio.spinner.remove();
+                        radium_gallery_h.spinner.remove();
                     }
                     else if (gallery[0].offsetWidth === gallery[0].scrollWidth) {
                         // if the first loaded images doesn't fill the
                         // offsetWidth of gallery then load some more images
-                        portfolio.loadNextImages(6);
+                        radium_gallery_h.loadNextImages(6);
                     }
 
                 }); // imagesLoaded()
@@ -387,7 +401,7 @@
         }, // loadNextImages
         navigation: {
             show: function() {
-                if (portfolio.navigation.created) {
+                if (radium_gallery_h.navigation.created) {
                     // arrows already exists, do not create again
                     $('.gallery-arrow-left, .gallery-arrow-right').show();
                     $('.gallery-arrow-left, .gallery-arrow-right').delay(6000).fadeOut();
@@ -398,33 +412,27 @@
                     $(gallery).prev('.gallery-arrow-left').css({
                         position: 'absolute',
                         left: '8px',
-                        height: portfolio.height,
+                        height: radium_gallery_h.height,
                         width: '50px',
                         'z-index': '9999',
-                        // inline image for arrow-left
-                        background: "url(data:image/png;base64,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) center left no-repeat",
-                        'background-position': '8px',
                         opacity: '0.5'
                     });
                     $(gallery).next('.gallery-arrow-right').css({
                         position: 'absolute',
                         right: '0',
                         top: $(gallery).position().top,
-                        height: portfolio.height,
+                        height: radium_gallery_h.height,
                         width: '50px',
                         'z-index': '9999',
-                        // inline image for arrow-right
-                        background: "url(data:image/png;base64,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) center left no-repeat",
-                        'background-position': '8px',
                         opacity: '0.5'
                     });
 
                     $(gallery).prev('.gallery-arrow-left').click(function(e) {
-                        portfolio.prev();
+                        radium_gallery_h.prev();
                     });
 
                     $(gallery).next('.gallery-arrow-right').click(function(e) {
-                        portfolio.next();
+                        radium_gallery_h.next();
                     });
 
                     $('.gallery-arrow-left, .gallery-arrow-right').hover(function(){
@@ -437,11 +445,11 @@
                     }); // hover()
 
                     $(gallery).mousemove(function(){
-                        portfolio.navigation.show();
+                        radium_gallery_h.navigation.show();
                     });
 
                     $('.gallery-arrow-left, .gallery-arrow-right').delay(6000).fadeOut();
-                    portfolio.navigation.created = true;
+                    radium_gallery_h.navigation.created = true;
 
                 } // if.. else..
             }, // show() 
@@ -450,7 +458,78 @@
                 $('.gallery-arrow-left, .gallery-arrow-right').fadeOut();
             }, // hide()
             created: false
-        } // navigation
+        }, // navigation
+        
+        thumbnails: { 
+        
+       		show: function() {
+        		
+        		if ( radium_gallery_h.thumbnails.created ) {
+        			
+        		} else {
+        			// create thumbnails
+        			$(gallery).parent().after('<div class="gallery-thumb-navigation"></div>');
+        			var divContent = $(gallery).html();
+        			$('.gallery-thumb-navigation').html( divContent );
+        			
+        			var whitelist = ['src', 'alt', 'data-index'];
+        			
+ 					$('.gallery-thumb-navigation img').each( function( index ) { 
+ 						
+ 						var url = $(this).data('src');
+ 						
+ 						$(this).attr({ 'src': url });
+ 						
+ 						//strip all other attributes
+ 						var attributes = this.attributes;
+					    var i = attributes.length;
+					    while( i-- ) {
+					        var attr = attributes[i];
+					        if( $.inArray(attr.name,whitelist) == -1 )
+					            this.removeAttributeNode(attr);
+					    }
+					    //adjust width
+ 						$(this).css({ cursor: 'pointer'  });   
+ 						
+ 					});
+ 					
+ 					$('.gallery-thumb-navigation .spinner-container').remove();
+ 					
+        			radium_gallery_h.thumbnails.created = true;	
+        			
+        		} // if.. else..
+        		
+        		
+        		 /* Click */
+	            $(".gallery-thumb-navigation img").click(function(event) {
+					
+					var index = $(this).data('index');
+						
+	                var image_match =  $(gallery).find("[data-index='" + index + "']");
+	
+                     if ( $(gallery).find('img.active')[0] === image_match[0]) {
+                        // If clicked on the current viewing image
+                        // then scroll to next image
+                        radium_gallery_h.next();
+    
+                    } else {
+                    
+                        // clicked on the next image or particular image, scroll to that image
+                        radium_gallery_h.slideTo( image_match );
+                    }
+                    
+                    console_.log( 'scroll via thumbnail' );
+	                
+	            }); // click()
+        		            		
+        	}, // show() 
+
+            hide: function() {
+                $('.gallery-thumb-nav').fadeOut();
+            }, // hide()
+            created: false	
+        
+        } //thumbnails
     }); // extend()
 
     // keyboard navigation
@@ -460,23 +539,23 @@
                     switch(key) {
                             case 73: // 'i' key
                                         // go to first slide
-                                    portfolio.slideTo($(gallery).find('img').first());
+                                    radium_gallery_h.slideTo($(gallery).find('img').first());
                                     break;
                             case 65: // 'a' key
                                         // go to last slide
-                                    portfolio.slideTo($(gallery).find('img').last());
+                                    radium_gallery_h.slideTo($(gallery).find('img').last());
                                     break;
 
                             case 75: // 'k' key
                             case 37: // left arrow
-                                    portfolio.navigation.hide();
-                                    portfolio.prev();
+                                    radium_gallery_h.navigation.hide();
+                                    radium_gallery_h.prev();
                                     e.preventDefault();
                                     break;
                             // case 74: // 'j' key
                             case 39: // right arrow
-                                    portfolio.navigation.hide();
-                                    portfolio.next();
+                                    radium_gallery_h.navigation.hide();
+                                    radium_gallery_h.next();
                                     e.preventDefault();
                                     break;
                     }
@@ -495,11 +574,11 @@
                 // console.log(l.join(' '));
             }
         },
-        active: portfolio.logger
+        active: radium_gallery_h.logger
     } // console_
 
     return this;
-} // $.fn.portfolio
+} // $.fn.radium_gallery_h
 
 // TODO
 // handle keyboard shortcuts in a smart way when multiple galleries are used

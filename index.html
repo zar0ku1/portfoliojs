@@ -116,7 +116,12 @@
             color: #555;
             display: none
         }
-
+		.gallery-thumb-navigation{
+			text-align: center;
+			margin: 0 auto;
+			display: block;
+			background: black;
+			}
         pre {
             padding: 15px;
             font-size: 12px;
@@ -134,7 +139,21 @@
     <script>
 
         $(document).ready(function() {
-            var p = $("#gallery").portfolio({ logger: true});
+            var p = $("#gallery").radium_gallery_h({ 
+            	autoplay: false,
+            	firstLoadCount: 4,
+            	enableKeyboardNavigation: true,
+            	loop: false,
+            	easingMethod: 'easeOutQuint',
+            	height: '500px',
+            	width: '100%',
+            	lightbox: false,
+            	showArrows: true,
+            	logger: false,
+            	showThumbnails: true,
+            	showScrollbar: false
+            });
+            
             p.init();
         }); // end of ready();
 
